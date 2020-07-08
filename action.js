@@ -25,7 +25,8 @@ document.addEventListener('DOMContentLoaded', e => {
 
 
    if (("Notification" in window)) {
-        if(Notification.permission != "granted") {
+       console.log(Notification.permission)
+        if(Notification.permission == "denied") {
             alert('Dont block notif please')
         } else {
             Notification.requestPermission()
