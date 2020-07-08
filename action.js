@@ -23,42 +23,46 @@ document.addEventListener('DOMContentLoaded', e => {
     const p256dh = document.querySelector('#dec')
     const auth = document.querySelector('#auth')
 
+    console.log(realvavid)
 
-   if (("Notification" in window)) {
-       console.log(Notification.permission)
-        if(Notification.permission == "denied") {
-            alert('Dont block notif please')
-        } else {
-            Notification.requestPermission()
-            .then(permit => {
-                navigator.serviceWorker.register('/sw.js', {
-                    scope: '/'
-                })
-                .then(async (register) => {
-          
-                    const publicVapidKey = realvavid;
-                    const subscription = await register.pushManager.subscribe({
-                        userVisibleOnly: true,
-                        applicationServerKey: urlBase64ToUint8Array(publicVapidKey),
+    if(realvavid.length > 20) {
+
+        if (("Notification" in window)) {
+            console.log(Notification.permission)
+                if(Notification.permission == "denied") {
+                    alert('Dont block notif please')
+                } else {
+                    Notification.requestPermission()
+                    .then(permit => {
+                        navigator.serviceWorker.register('/sw.js', {
+                            scope: '/'
+                        })
+                        .then(async (register) => {
+                
+                            const publicVapidKey = realvavid;
+                            const subscription = await register.pushManager.subscribe({
+                                userVisibleOnly: true,
+                                applicationServerKey: urlBase64ToUint8Array(publicVapidKey),
+                            });
+                            const parsed = JSON.parse(JSON.stringify(subscription))
+                            console.log(parsed)
+                            endpoint.textContent = parsed.endpoint
+                            expiration.textContent = parsed.expirationTime  || 'null'
+                            p256dh.textContent = parsed.keys.p256dh
+                            auth.textContent = parsed.keys.auth
+
+                        })
+                        .catch(e => {
+                            console.log('err')
+                            console.log(e)
+                            window.location.reload()
+                        })
                     });
-                    const parsed = JSON.parse(JSON.stringify(subscription))
-                    console.log(parsed)
-                    endpoint.textContent = parsed.endpoint
-                    expiration.textContent = parsed.expirationTime  || 'null'
-                    p256dh.textContent = parsed.keys.p256dh
-                    auth.textContent = parsed.keys.auth
-
-                })
-                .catch(e => {
-                    console.log('err')
-                    console.log(e)
-                    window.location.reload()
-                })
-            });
+                }
+        } else {
+            alert("BROWSER NOT SUPPORTED")
         }
-   } else {
-       alert("BROWSER NOT SUPPORTED")
-   }
+        }
    
     
 })
